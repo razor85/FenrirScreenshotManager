@@ -2,3 +2,4 @@
 libs/__pycache__*
 /sega saturn/*
 /temp/*
+/build/*

@@ -6,8 +6,9 @@ import threading
 import time
 from pathlib import Path
 
+print('Current directory: {}'.format(Path.cwd()))
 def getCurrentDir():
-  return Path(os.path.dirname(__file__)).parent
+  return Path.cwd()
 
 screenshot_folder = getCurrentDir() / Path('sega saturn') / Path('screenshots')
 def getScreenshotFolder():
@@ -54,8 +55,7 @@ def _download_thumbnails(search_query, max_thumbnails=12):
                max_urls=max_thumbnails,
                folder=temp_directory,
                thumbnails=True,
-               parallel=True,
-               target_resolution=(128,96))
+               target_resolution=(256,192))
 
 class QueryResults:
   def __init__(self, search_query, max_thumbnails):

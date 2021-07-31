@@ -174,15 +174,20 @@ class MainWindow(main_base, main_form):
     selected_cover = results.exec()
     if selected_cover:
       img = Image.open(selected_cover)
-      img.resize((128, 96))
+      img = img.resize((128, 96))
       output_name = disk_util.getScreenshotFolder() / Path('{}.jpg'.format(game_name))
       img.save(output_name, 'JPEG', quality=100)
-      self.setThumbnailToFile(selected_cover)
+      self.setThumbnailToFile(str(output_name))
 
   def browseGamesFolder(self):
     new_games = QFileDialog.getExistingDirectory()
     if new_games:
       disk_util.games_folder = Path(new_games)
+      screenshot_folder = disk_util.games_folder / Path('screenshots')
+      if screenshot_folder.exists():
+        disk_util.screenshot_folder = screenshot_folder
+        self.screenshotsEdit.setText(str(screenshot_folder))
+
       self.gameFolderEdit.setText(new_games)
       self.showGamesList()
       self.gameSelectionChanged()

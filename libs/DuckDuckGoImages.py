@@ -12,10 +12,9 @@ import shutil
 import random
 import requests
 from PIL import Image
-from joblib import Parallel, delayed
 
 def download(query, folder='.', max_urls=None, thumbnails=False,
-             parallel=False, shuffle=False, remove_folder=False, use_name=None,
+             shuffle=False, remove_folder=False, use_name=None,
              target_resolution=None):
 
     if thumbnails:
@@ -33,10 +32,7 @@ def download(query, folder='.', max_urls=None, thumbnails=False,
         _remove_folder(folder)
 
     _create_folder(folder)
-    if parallel:
-        return _parallel_download_urls(urls, folder, use_name, target_resolution)
-    else:
-        return _download_urls(urls, folder, use_name, target_resolution)
+    return _download_urls(urls, folder, use_name, target_resolution)
 
 def _download(url, folder, use_name, target_resolution):
         try:
@@ -64,15 +60,6 @@ def _download_urls(urls, folder, use_name, target_resolution):
         filename = use_name[index] if isinstance(use_name, list) == 1 else use_name
         if _download(url, folder, filename, target_resolution):
             downloaded += 1
-    return downloaded
-
-def _parallel_download_urls(urls, folder, use_name, target_resolution):
-    downloaded = 0
-    with Parallel(n_jobs=os.cpu_count()) as parallel:
-        results = parallel(delayed(_download)(url, folder, None, target_resolution) for url in urls)
-        for result in results:
-            if result:
-                downloaded += 1
     return downloaded
 
 def get_image_urls(query):
