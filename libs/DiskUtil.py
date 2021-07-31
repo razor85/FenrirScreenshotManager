@@ -31,12 +31,16 @@ def cleanName(name):
 def get_game_list():
   sd_directory = getGamesFolder()
   game_list = []
-  for filename in sd_directory.glob('*'):
-    if 'System Volume Information' in filename.name:
-      continue
+  extensions = ['ccd', 'img', 'cue', 'iso']
+  for extension in extensions:
+    for filename in sd_directory.glob('**/*.{}'.format(extension)):
+      directory = filename.parent
+      dirname = directory.name
+      if 'System Volume Information' in dirname:
+        continue
 
-    if filename.is_dir():
-      game_list.append(filename.name)
+      if directory.is_dir() and dirname not in game_list:
+        game_list.append(dirname)
 
   return game_list
 
