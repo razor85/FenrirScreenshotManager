@@ -19,7 +19,7 @@
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Search term:</string>
+        <string>Search:</string>
        </property>
       </widget>
      </item>
@@ -60,6 +60,9 @@
    </item>
    <item>
     <widget class="QScrollArea" name="resultsScrollArea">
+     <property name="accessibleName">
+      <string/>
+     </property>
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>

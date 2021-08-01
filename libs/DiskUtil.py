@@ -20,10 +20,16 @@ def getGamesFolder():
   global games_folder
   return games_folder
 
-temp_Folder = getCurrentDir() / Path('temp')
+temp_folder = getCurrentDir() / Path('temp')
 def getTempFolder():
-  global temp_Folder
-  return temp_Folder
+  global temp_folder
+  return temp_folder
+
+def getImagesTempFolder():
+  return getTempFolder() / Path('images')
+
+def getScreenshotsTempFolder():
+  return getTempFolder() / Path('screenshots')
 
 def cleanName(name):
   return re.sub('\s*\(.*\)\s*', '', name)
@@ -45,13 +51,13 @@ def get_game_list():
   return game_list
 
 def get_thumbnail(game_name):
-  output_dir = getScreenshotFolder()
+  output_dir = getScreenshotsTempFolder()
   image_file = output_dir / Path('{}.jpg'.format(game_name))
   if image_file.exists():
     return image_file
 
 def _download_thumbnails(search_query, max_thumbnails=12):
-  temp_directory = getTempFolder()
+  temp_directory = getImagesTempFolder()
   if temp_directory.exists():
     shutil.rmtree(temp_directory)
 
@@ -61,12 +67,32 @@ def _download_thumbnails(search_query, max_thumbnails=12):
                thumbnails=True,
                target_resolution=(256,192))
 
-class QueryResults:
-  def __init__(self, search_query, max_thumbnails):
-    self.thread = threading.Thread(target=_download_thumbnails,
-                                   args=(search_query, max_thumbnails))
+  return True
+
+class AsyncJob:
+  def __init__(self, func):
+    self.thread = threading.Thread(target=self.wrapFunc, args=(func,))
+    self.exception = None
+    self.return_code = 0
     self.thread.start()
 
+  def wrapFunc(self, func):
+    try:
+      self.return_code = func()
+      if not self.return_code:
+        self.return_code = True
+    except Exception as e:
+      self.exception = e
+
   def done(self):
-    self.thread.join(0.1)
-    return not self.thread.is_alive()
+    if self.thread.is_alive():
+      self.thread.join(0.1)
+
+    if self.thread.is_alive():
+      return False
+    else:
+      if self.exception:
+        raise self.exception
+      else:
+        return self.return_code
+
