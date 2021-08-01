@@ -12,6 +12,7 @@ from PIL import Image
 from pathlib import Path
 from libs.FlowLayout import FlowLayout
 from libs.AsyncQtJob import AsyncQtJob
+from libs.TitleFrame import TitleFrame
 import libs.DiskUtil as disk_util
 import io
 import shutil
@@ -77,7 +78,7 @@ class SelectFolderWindow(select_folder_base, select_folder_form):
                                     QMessageBox.Yes | QMessageBox.No)
 
       if answer == QMessageBox.Yes:
-        screenshots.mkdir()
+        screenshots.mkdir(parents=True)
         super().done(ret_code)
     else:
       super().done(ret_code)
@@ -239,7 +240,7 @@ class MainWindow(main_base, main_form):
     if temp_directory.exists():
       shutil.rmtree(temp_directory)
 
-    temp_directory.mkdir()
+    temp_directory.mkdir(parents=True)
     original_files = self.games_screenshot_directory.glob('*.jpg')
     for filename in original_files:
       shutil.copyfile(filename, temp_directory / filename.name)
@@ -263,7 +264,7 @@ class MainWindow(main_base, main_form):
     while backup_folder.exists():
       backup_folder = self.games_directory / Path('screenshots_backup{}'.format(count))
 
-    backup_folder.mkdir()
+    backup_folder.mkdir(parents=True)
     original_files = self.games_screenshot_directory.glob('*.jpg')
     for filename in original_files:
       shutil.copyfile(filename, backup_folder / filename.name)
