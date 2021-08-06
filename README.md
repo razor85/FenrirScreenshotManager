@@ -10,5 +10,5 @@ From the command line, run the following commands to launch the application:
 ```
 git clone https://github.com/razor85/FenrirScreenshotManager.git
 pip install -r requirements.txt 
-python3 fenrirScreenshotManager.py
+python fenrirScreenshotManager.py
 ```
