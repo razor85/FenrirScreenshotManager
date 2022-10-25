@@ -58,10 +58,10 @@ def _download(url, folder, use_name, target_resolution):
 def _download_urls(urls, folder, use_name, target_resolution):
     downloaded = 0
     for index, url in enumerate(urls):
-        print(url)
         filename = use_name[index] if isinstance(use_name, list) == 1 else use_name
         if _download(url, folder, filename, target_resolution):
             downloaded += 1
+
     return downloaded
 
 def get_image_urls(query):
