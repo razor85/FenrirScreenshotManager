@@ -51,12 +51,14 @@ def _download(url, folder, use_name, target_resolution):
 
                     im.save(out_file)
                     return True
-        except:
+        except Exception as e:
+            print('Error downloading: {}'.format(str(e)))
             return False
 
 def _download_urls(urls, folder, use_name, target_resolution):
     downloaded = 0
     for index, url in enumerate(urls):
+        print(url)
         filename = use_name[index] if isinstance(use_name, list) == 1 else use_name
         if _download(url, folder, filename, target_resolution):
             downloaded += 1
@@ -73,10 +75,13 @@ def get_image_thumbnails_urls(query):
 def _fetch_token(query, URL="https://duckduckgo.com/"):
     res = requests.post(URL, data={'q': query})
     if res.status_code != 200:
+        print('Error fetching token({}): {}'.format(res.status_code, res.content))
         return ""
+
     match = re.search(r"vqd='([\d-]+)'", res.text, re.M|re.I)
     if match is None:
         return ""
+
     return match.group(1)
 
 def _fetch_search_urls(query, token, URL="https://duckduckgo.com/", what="image"):
@@ -85,13 +90,23 @@ def _fetch_search_urls(query, token, URL="https://duckduckgo.com/", what="image"
         "q": query,
         "l": "wt-wt",
         "o": "json",
-        "f": ",,,",
+        "f": ",,,,,",
         "p": "2"
     }
+
+    headers = {
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Referer": "https://duckduckgo.com/",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin"
+    }
+
     urls = []
 
-    res = requests.get(URL+"i.js", params=query)
+    res = requests.get(URL+"i.js", params=query, headers=headers)
     if res.status_code != 200:
+        print('Error fetching search url({}): {}'.format(res.status_code, res.content))
         return urls
 
     data = json.loads(res.text)
@@ -101,10 +116,13 @@ def _fetch_search_urls(query, token, URL="https://duckduckgo.com/", what="image"
     while "next" in data:
         res = requests.get(URL+data["next"], params=query)
         if res.status_code != 200:
+            print('Error fetching next page search url({}): {}'.format(res.status_code, res.content))
             return urls
+
         data = json.loads(res.text)
         for result in data["results"]:
             urls.append(result[what])
+
     return urls
 
 def _remove_folder(folder):
