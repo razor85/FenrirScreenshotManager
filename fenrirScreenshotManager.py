@@ -70,7 +70,7 @@ class SelectFolderWindow(select_folder_base, select_folder_form):
 
   def done(self, ret_code):
     path = self.directoryEdit.text()
-    screenshots = Path(path) / Path('/screenshots')
+    screenshots = Path(path) / Path('screenshots')
     if not screenshots.exists() and ret_code != 0:
       msg = 'Invalid SD card path, \'{}\' directory not found. Create it and continue?'
       answer = QMessageBox.question(None, 'Screenshots not found',
