@@ -78,7 +78,7 @@ def _fetch_token(query, URL="https://duckduckgo.com/"):
         print('Error fetching token({}): {}'.format(res.status_code, res.content))
         return ""
 
-    match = re.search(r"vqd='([\d-]+)'", res.text, re.M|re.I)
+    match = re.search(r"vqd='?([\d-]+)'?", res.text, re.M|re.I)
     if match is None:
         return ""
 
