@@ -73,13 +73,19 @@ def get_image_thumbnails_urls(query):
     return _fetch_search_urls(query, token, what="thumbnail")
 
 def _fetch_token(query, URL="https://duckduckgo.com/"):
-    res = requests.post(URL, data={'q': query})
+    headers = {
+        'Host': 'duckduckgo.com',
+        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0',
+    }
+
+    res = requests.post(URL, data={'q': query}, headers=headers)
     if res.status_code != 200:
         print('Error fetching token({}): {}'.format(res.status_code, res.content))
         return ""
 
     match = re.search(r"vqd='?([\d-]+)'?", res.text, re.M|re.I)
     if match is None:
+        print(f'Did not find token data in {res.text}')
         return ""
 
     return match.group(1)
@@ -88,7 +94,7 @@ def _fetch_search_urls(query, token, URL="https://duckduckgo.com/", what="image"
     query = {
         "vqd": token,
         "q": query,
-        "l": "wt-wt",
+        "l": "us-en",
         "o": "json",
         "f": ",,,,,",
         "p": "2"
