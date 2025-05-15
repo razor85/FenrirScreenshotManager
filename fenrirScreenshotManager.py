@@ -14,7 +14,6 @@ from libs.FlowLayout import FlowLayout
 from libs.AsyncQtJob import AsyncQtJob
 from libs.TitleFrame import TitleFrame
 import libs.DiskUtil as disk_util
-import io
 import shutil
 import sys
 
@@ -150,11 +149,15 @@ class ResultsWindow(results_base, results_form):
     self.loading.exec()
 
   def queryDone(self, query):
-    self.loading.close()
-    self.loading = None
-    if query.done():
+    if self.loading:
+      self.loading.close()
+      self.loading = None
+
+    if query is not None and query.done():
       self.searchQuery = None
       self.displaySearchResults()
+    else:
+      self.setComponentsState(True)
 
   def displaySearchResults(self):
     self.setComponentsState(True)

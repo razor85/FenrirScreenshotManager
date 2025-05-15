@@ -1,10 +1,14 @@
-import libs.DuckDuckGoImages as ddg
+from PIL import Image
+from duckduckgo_search import DDGS
+from pathlib import Path
+import io
 import os
 import re
+import requests
 import shutil
 import threading
 import time
-from pathlib import Path
+import uuid
 
 print('Current directory: {}'.format(Path.cwd()))
 def getCurrentDir():
@@ -32,7 +36,7 @@ def getScreenshotsTempFolder():
   return getTempFolder() / Path('screenshots')
 
 def cleanName(name):
-  return re.sub('\s*\(.*\)\s*', '', name)
+  return re.sub('\\s*\\(.*\\)\\s*', '', name)
 
 def get_game_list():
   sd_directory = getGamesFolder()
@@ -61,12 +65,21 @@ def _download_thumbnails(search_query, max_thumbnails=12):
   if temp_directory.exists():
     shutil.rmtree(temp_directory)
 
-  ddg.download(search_query,
-               max_urls=max_thumbnails,
-               folder=temp_directory,
-               thumbnails=True,
-               target_resolution=(256,192))
+  results = DDGS().images(search_query, max_results=max_thumbnails)
+  
+  os.makedirs(temp_directory)
+  for img in results:
+    thumbnail_url = img['thumbnail']
+    filename = str(uuid.uuid4().hex)
+    while os.path.exists("{}/{}.jpg".format(temp_directory, filename)):
+      filename = str(uuid.uuid4().hex)
 
+    response = requests.get(thumbnail_url, stream=True, timeout=2.0, allow_redirects=True)
+    with Image.open(io.BytesIO(response.content)) as im:
+        with open("{}/{}.jpg".format(temp_directory, filename), 'wb') as out_file:
+            im = im.resize((256,192))
+            im.save(out_file)
+  
   return True
 
 class AsyncJob:

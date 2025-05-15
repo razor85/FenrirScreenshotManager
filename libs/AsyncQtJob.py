@@ -20,6 +20,11 @@ class AsyncQtJob(AsyncJob):
         self.gui_done(self)
 
     except Exception as e:
-      QMessageBox.information(self, 'Error', 'Error executing task: {}'.format(str(e)))
+      QMessageBox.information(None, 'Error', 'Error executing task: {}'.format(str(e)))
+      if self.timer:
+        self.timer.stop()
+        self.timer = None
+
+      self.gui_done(None)
 
 
